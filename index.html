@@ -4,85 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 1em 0;
-            text-align: center;
-        }
-
-        main {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .card {
-            width: 300px;
-            margin: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .card a {
-            display: block;
-            margin-top: 10px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .card a:hover {
-            text-decoration: underline;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1em 0;
-            background-color: #333;
-            color: #fff;
-        }
-    </style>
+    <link href="./style.css" rel="stylesheet">   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome!</h1>
+    <header class="main-header">
+        <h1><i class="fa fa-wrench"></i> Tool Hub</h1>
     </header>
 
     <main>
-        <div class="card">
-            <h2>PDF Tools</h2>
-            <p>Explore our PDF tools.</p>
-            <a href="#">Go to PDF Tools</a>
-        </div>
+        <a href="#" class="card-link">
+            <div class="card">
+                <h2><i class="fa fa-file-pdf-o"></i> PDF Tools</h2>
+                <p>Explore our PDF tools.</p>
+            </div>
+        </a>
 
-        <div class="card">
-            <h2>Image Tools</h2>
-            <p>Explore our Image tools.</p>
-            <a href="#">Go to Image Tools</a>
-        </div>
+        <a href="#" class="card-link">
+            <div class="card">
+                <h2><i class="fa fa-file-image-o"></i> Image Tools</h2>
+                <p>Explore our Image tools.</p>
+            </div>
+        </a>
 
-        <div class="card">
-            <h2>Image Compression Tool</h2>
-            <p>Compress your images online.</p>
-            <a href="image-compressor.html">Go to Image Compression Tool</a>
-        </div>
+        <a href="image-compressor.html" class="card-link">
+            <div class="card">
+                <h2><i class="fa fa-compress"></i> Image Compression Tool</h2>
+                <p>Compress your images online.</p>
+            </div>
+        </a>
     </main>
 
+    <div class="ad-container">
+        <aside class="ad-placeholder">
+            <!-- AdSense Ad Unit 1 -->
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
+                 crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
+                 data-ad-slot="yyyyyyyyyy"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </aside>
+        <aside class="ad-placeholder">
+            <!-- AdSense Ad Unit 2 -->
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
+                 crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
+                 data-ad-slot="zzzzzzzzzz"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </aside>
+    </div>
+
     <footer>
-        <p>&copy; 2025 Home Page</p>
+        <p>&copy;SPICY444 2025 Home Page</p>
     </footer>
+	<script src=""></script>
 </body>
 </html>
