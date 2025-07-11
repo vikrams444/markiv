@@ -330,8 +330,8 @@
                 </div>
                 
                 <div class="control-group">
-                    <label for="qualityRange">Quality: <span id="qualityValue" class="range-value">80</span>%</label>
-                    <input type="range" id="qualityRange" min="1" max="100" value="80">
+                    <label for="qualityRange">Quality: <span id="qualityValue" class="range-value">50</span>%</label>
+                    <input type="range" id="qualityRange" min="1" max="100" value="50">
                 </div>
                 
                 <div class="control-group">
@@ -401,6 +401,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Set current year in footer
@@ -430,7 +431,7 @@
             const downloadBtn = document.getElementById('downloadBtn');
             
             let originalFile = null;
-            let compressedBlob = null;
+            let compressedFile = null;
             
             // Event listeners
             browseBtn.addEventListener('click', () => fileInput.click());
@@ -509,90 +510,70 @@
                 heightControl.style.display = value === 'height' || value === 'both' ? 'block' : 'none';
             }
             
-            function compressImage() {
+            async function compressImage() {
                 if (!originalFile) return;
-                
-                // Show loading indicator
+
                 loadingIndicator.style.display = 'block';
                 resultsSection.style.display = 'none';
-                
-                // Simulate processing delay (in a real app, this would be actual compression)
-                setTimeout(() => {
-                    // This is a simulation - in a real app you would use canvas or a compression library
-                    simulateCompression(originalFile);
+
+                let outputFormat = formatSelect.value;
+                if (outputFormat === 'auto') {
+                    const originalType = originalFile.type.split('/')[1];
+                    const supportedOutputTypes = ['jpeg', 'png', 'webp'];
+                    if (supportedOutputTypes.includes(originalType)) {
+                        outputFormat = originalType;
+                    } else {
+                        outputFormat = 'png'; // Default to PNG for unsupported types
+                    }
+                }
+
+                const options = {
+                    maxSizeMB: 1,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    initialQuality: parseInt(qualityRange.value) / 100,
+                    fileType: `image/${outputFormat}`
+                };
+
+                const resizeType = resizeToggle.value;
+                if (resizeType === 'width') {
+                    options.maxWidthOrHeight = parseInt(document.getElementById('resizeWidth').value) || 1920;
+                } else if (resizeType === 'height') {
+                    options.maxWidthOrHeight = parseInt(document.getElementById('resizeHeight').value) || 1920;
+                } else if (resizeType === 'both') {
+                    options.maxWidthOrHeight = Math.max(
+                        parseInt(document.getElementById('resizeWidth').value) || 0,
+                        parseInt(document.getElementById('resizeHeight').value) || 0
+                    ) || 1920;
+                }
+
+                try {
+                    compressedFile = await imageCompression(originalFile, options);
+
+                    compressedPreview.src = URL.createObjectURL(compressedFile);
+                    compressedSize.textContent = `Size: ${formatFileSize(compressedFile.size)}`;
                     
-                    // Hide loading indicator
-                    loadingIndicator.style.display = 'none';
-                    
-                    // Show results
-                    resultsSection.style.display = 'block';
-                }, 1500);
-            }
-            
-            function simulateCompression(file) {
-                // In a real implementation, you would:
-                // 1. Create a canvas element
-                // 2. Draw the image on the canvas (with optional resizing)
-                // 3. Convert to the desired format with quality settings
-                // 4. Get the compressed blob with canvas.toBlob()
-                
-                // For this demo, we'll simulate compression with a smaller size
-                const quality = parseInt(qualityRange.value) / 100;
-                const simulatedSize = Math.max(file.size * (1 - quality * 0.8), file.size * 0.1);
-                
-                // Create a "compressed" blob (in reality, this would be the actual compressed image)
-                compressedBlob = new Blob([file], { type: file.type });
-                
-                // Display compressed preview (same as original in this simulation)
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    compressedPreview.src = e.target.result;
-                    
-                    // Get simulated dimensions based on resize settings
                     const img = new Image();
                     img.onload = function() {
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        const resizeType = resizeToggle.value;
-                        if (resizeType !== 'no') {
-                            if (resizeType === 'width' || resizeType === 'both') {
-                                const targetWidth = parseInt(document.getElementById('resizeWidth').value) || width;
-                                const ratio = targetWidth / width;
-                                width = targetWidth;
-                                height = Math.round(height * ratio);
-                            }
-                            
-                            if (resizeType === 'height' || resizeType === 'both') {
-                                const targetHeight = parseInt(document.getElementById('resizeHeight').value) || height;
-                                const ratio = targetHeight / height;
-                                height = targetHeight;
-                                width = Math.round(width * ratio);
-                            }
-                        }
-                        
-                        compressedDimensions.textContent = `Dimensions: ${width} × ${height} px`;
+                        compressedDimensions.textContent = `Dimensions: ${img.width} × ${img.height} px`;
                     };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-                
-                // Update file info
-                compressedSize.textContent = `Size: ${formatFileSize(simulatedSize)}`;
-                
-                const reduction = ((file.size - simulatedSize) / file.size * 100).toFixed(1);
-                compressionRatio.textContent = `Reduction: ${reduction}%`;
-                
-                savingsInfo.textContent = `You saved ${formatFileSize(file.size - simulatedSize)} (${reduction}% reduction)!`;
-                
-                // Set up download
-                const fileName = originalFile.name.replace(/\.[^/.]+$/, '');
-                const fileExt = formatSelect.value === 'auto' ? 
-                    originalFile.name.split('.').pop() : 
-                    formatSelect.value;
-                
-                downloadBtn.href = URL.createObjectURL(compressedBlob);
-                downloadBtn.download = `${fileName}_compressed.${fileExt}`;
+                    img.src = URL.createObjectURL(compressedFile);
+
+                    const reduction = ((originalFile.size - compressedFile.size) / originalFile.size * 100).toFixed(1);
+                    compressionRatio.textContent = `Reduction: ${reduction}%`;
+                    savingsInfo.textContent = `You saved ${formatFileSize(originalFile.size - compressedFile.size)} (${reduction}% reduction)!`;
+
+                    const fileName = originalFile.name.replace(/\.[^/.]+$/, '');
+                    downloadBtn.href = URL.createObjectURL(compressedFile);
+                    downloadBtn.download = `${fileName}_compressed.${outputFormat}`;
+
+                } catch (error) {
+                    console.error(error);
+                    alert('An error occurred during compression.');
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                    resultsSection.style.display = 'block';
+                }
             }
             
             function formatFileSize(bytes) {
